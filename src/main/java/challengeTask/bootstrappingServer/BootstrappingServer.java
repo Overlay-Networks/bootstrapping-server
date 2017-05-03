@@ -6,7 +6,8 @@ import java.net.ServerSocket;
 import java.util.Random;
 
 import net.tomp2p.connection.Bindings;
-import net.tomp2p.p2p.Peer;
+import net.tomp2p.dht.PeerBuilderDHT;
+import net.tomp2p.dht.PeerDHT;
 import net.tomp2p.p2p.PeerBuilder;
 import net.tomp2p.peers.Number160;
 import net.tomp2p.peers.PeerAddress;
@@ -14,7 +15,7 @@ import net.tomp2p.peers.PeerAddress;
 public class BootstrappingServer {
 	
 	private ServerSocket socket;
-	private Peer server;
+	private PeerDHT bootstrappingPeer;
 	private Random random;
 
 	public BootstrappingServer() throws IOException {
@@ -25,12 +26,13 @@ public class BootstrappingServer {
 	
 	public void start() {
 		System.out.println("Attempting to start peer at " + socket.getInetAddress().getHostAddress() + ":" + socket.getLocalPort());
-		Bindings binding = new Bindings().addAddress(socket.getInetAddress());
+		Bindings bindings = new Bindings().addAddress(socket.getInetAddress());
 		try {
-			server = new PeerBuilder(new Number160(random)).bindings(binding).ports(socket.getLocalPort()).start();
+			bootstrappingPeer = new PeerBuilderDHT(new PeerBuilder(new Number160(random)).bindings(bindings).ports(socket.getLocalPort()).start()).start();
 			System.out.println("Bootstrapping peer started!");
 			System.out.println("IP: " + socket.getInetAddress().getHostAddress());
 			System.out.println("PORT: " + socket.getLocalPort());
+			socket.accept();
 		} catch (IOException ie) {
 			System.err.println("Failed to start bootstrapping peer!");
 			System.err.println(ie.getMessage());
@@ -38,11 +40,11 @@ public class BootstrappingServer {
 	}
 	
 	public PeerAddress getAddress() {
-		return server.peerAddress();
+		return bootstrappingPeer.peerAddress();
 	}
 	
 	public void shutdown() {
-		server.shutdown();
+		bootstrappingPeer.shutdown();
 	}
 	
 }
