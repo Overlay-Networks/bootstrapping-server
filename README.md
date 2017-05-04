@@ -7,3 +7,4 @@ Bootstrapping server implementation for P2P system
 
 - Run the application by running `src/main/java/challengeTask/bootstrappingServer/BootstrappingServerApp.java` as a Java application.
 - In console, you can find IP and port of the bootstrapping server which can be used to as constants in 'challenge-task' application.
+- Quit the application by writing 'quit' or 'close' in command-line (please, don't user Ctrl-C).
