@@ -25,14 +25,17 @@ public class BootstrappingServer {
 	}
 	
 	public void start() {
-		System.out.println("Attempting to start peer at " + socket.getInetAddress().getHostAddress() + ":" + socket.getLocalPort());
-		Bindings bindings = new Bindings().addAddress(socket.getInetAddress());
+		/* Retrieve inet address and port from ServerSocket, so they are open for sure */
+		InetAddress address = socket.getInetAddress();
+		int port = socket.getLocalPort();
+		System.out.println("Attempting to start peer at " + address.getHostAddress() + ":" + port);
+		Bindings bindings = new Bindings().addAddress(address);
 		try {
-			bootstrappingPeer = new PeerBuilderDHT(new PeerBuilder(new Number160(random)).bindings(bindings).ports(socket.getLocalPort()).start()).start();
+			socket.close();
+			bootstrappingPeer = new PeerBuilderDHT(new PeerBuilder(new Number160(random)).bindings(bindings).ports(port).start()).start();
 			System.out.println("Bootstrapping peer started!");
-			System.out.println("IP: " + socket.getInetAddress().getHostAddress());
-			System.out.println("PORT: " + socket.getLocalPort());
-			socket.accept();
+			System.out.println("IP: " + address.getHostAddress());
+			System.out.println("PORT: " + port);
 		} catch (IOException ie) {
 			System.err.println("Failed to start bootstrapping peer!");
 			System.err.println(ie.getMessage());
